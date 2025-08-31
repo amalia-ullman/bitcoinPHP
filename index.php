@@ -4,6 +4,7 @@
 // $file = "new.txt";
 // $stringdata = "hi";
 //file_put_contents("new.txt", "hi");
+date_default_timezone_set('America/Los_Angeles');
 
 ?>
 
@@ -16,7 +17,7 @@
     <title>Coingeckp Playground</title>
 </head>
 <body class="container">
-    <h1>Coingecko Playground</h1>
+    <h1><a href="/">Coingecko Playground</a></h1>
 
 
     <form action="index.php" method="GET">
@@ -40,14 +41,44 @@
         <input type="submit" value="Get Price">
     </form>
 
+    <table>
+        <tr>
+            <th>Crypto</th>
+            <th>FIAT</th>
+            <th>Value</th>
+            <th>Timestamp</th>
+        </tr>
+            <?php
+                $queries_log = file_get_contents("data/recent_prices.log");
+                $queries_log_lines = explode("\n", $queries_log);
+
+                foreach($queries_log_lines as $search){
+                    echo "<tr>";
+
+                    $search_parts = explode('"', $search);
+                    if(!isset($search_parts[1])){
+                        break;
+                    }
+                    echo "<td>" . $search_parts[1] . "</td>";
+                    echo "<td>" . $search_parts[3] . "</td>";
+                    echo "<td>" . substr($search_parts[4], 1, -2) . "</td>";
+                    echo "<td>" . $search_parts[7] . "</td>";
+                    echo "</tr>";
+                }
+            ?>
+    </table>
+
+    
+
     <p>
         <?php
             if(isset($_GET['crypto']) && isset($_GET['fiat'])){
                 $url = "https://api.coingecko.com/api/v3/simple/price?ids=" . htmlspecialchars($_GET['crypto']) . "&vs_currencies=" . htmlspecialchars($_GET['fiat']);
                 $res = file_get_contents($url);
-                echo $res;
+                $data = json_decode($res);
+                $data->timestamp = date("Y-m-d H:i:s");
                 file_put_contents("urls.txt", $url . "\n", FILE_APPEND);
-                file_put_contents("results.txt", $res . "\n", FILE_APPEND);
+                file_put_contents("data/recent_prices.log", json_encode($data) . "\n", FILE_APPEND);
             }
             if(!isset($_GET['crypto'])){
                 echo "Please select a cryptocurrency";

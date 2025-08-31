@@ -1,1 +1,7 @@
-https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=
+https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
+https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
+https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
+https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
+https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
+https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=aud
+https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=eur

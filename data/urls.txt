@@ -1,0 +1,3 @@
+https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd
+https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd
+https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd
