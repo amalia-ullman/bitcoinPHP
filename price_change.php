@@ -2,6 +2,9 @@
 
 if (isset($_GET['crypto']) && isset($_GET['fiat']) && isset($_GET['start_date']) && isset($_GET['end_date'])) {
     $coingecko_api_url = "https://api.coingecko.com/api/v3/coins/" . $_GET['crypto'] . "/market_chart/range?vs_currency=" . $_GET['fiat'] . "&from=" . $_GET['start_date'] . "&to=" . $_GET['end_date'];
+
+    $price_data = json_decode(file_get_contents($coingecko_api_url));
+    var_dump($price_data->{'prices'}[0]);
 }
 ?>
 
@@ -103,10 +106,10 @@ if (isset($_GET['crypto']) && isset($_GET['fiat']) && isset($_GET['start_date'])
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: ['08-31 00:00', '08-31 01:00', '08-31 02:00'],
+                        labels: <?php echo json_encode($price_data->{'prices'}) ?>,
                         datasets: [{
                             label: 'price by date (hourly)',
-                            data: [108781.957, 109321.613, 109453.205],
+                            data: <?php echo json_encode($price_data->{'prices'}) ?>,
                             borderWidth: 1
                         }]
                     },
