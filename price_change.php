@@ -4,7 +4,12 @@ if (isset($_GET['crypto']) && isset($_GET['fiat']) && isset($_GET['start_date'])
     $coingecko_api_url = "https://api.coingecko.com/api/v3/coins/" . $_GET['crypto'] . "/market_chart/range?vs_currency=" . $_GET['fiat'] . "&from=" . $_GET['start_date'] . "&to=" . $_GET['end_date'];
 
     $price_data = json_decode(file_get_contents($coingecko_api_url));
+
+    $timestamp = $price_data->{'prices'}[0][0];
+    $timestamp = intval($timestamp / 1000);
     var_dump($price_data->{'prices'}[0]);
+
+    //echo date("Y-m-d", $timestamp);
 }
 ?>
 
@@ -95,21 +100,35 @@ if (isset($_GET['crypto']) && isset($_GET['fiat']) && isset($_GET['start_date'])
     </form>\
 
     <?php
-    if (isset($coingecko_api_url)): ?>
+    if (isset($coingecko_api_url)):
+
+        foreach ($price_data->{'prices'} as $item) {
+            $timestamp = intval($item[0] / 1000);
+            $timestamps[] = $timestamp;
+            $prices[] = $item[1];
+        }
+    ?>
         Querying: <code><?= $coingecko_api_url ?></code>
+
+
 
         <div>
             <canvas id="myChart"></canvas>
             <script>
                 const ctx = document.getElementById('myChart');
-
+                // echo date("Y-m-d", intval($price_data->{'prices'}[0][0] / 1000))
+                // echo json_encode($price_data->{'prices'})
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: <?php echo json_encode($price_data->{'prices'}) ?>,
+                        labels: [<?php foreach ($timestamps as $ts) {
+                                        echo date("'Y-m-d-H:i'", $ts) . ",";
+                                    } ?>],
                         datasets: [{
                             label: 'price by date (hourly)',
-                            data: <?php echo json_encode($price_data->{'prices'}) ?>,
+                            data: [<?php foreach ($prices as $p) {
+                                        echo $p . ",";
+                                    } ?>],
                             borderWidth: 1
                         }]
                     },
