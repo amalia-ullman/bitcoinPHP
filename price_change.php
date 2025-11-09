@@ -1,13 +1,28 @@
 <?php
 
+$errors = [];
+
 if (isset($_GET['crypto']) && isset($_GET['fiat']) && isset($_GET['start_date']) && isset($_GET['end_date'])) {
-    $coingecko_api_url = "https://api.coingecko.com/api/v3/coins/" . $_GET['crypto'] . "/market_chart/range?vs_currency=" . $_GET['fiat'] . "&from=" . $_GET['start_date'] . "&to=" . $_GET['end_date'];
 
-    $price_data = json_decode(file_get_contents($coingecko_api_url));
 
-    $timestamp = $price_data->{'prices'}[0][0];
-    $timestamp = intval($timestamp / 1000);
-    var_dump($price_data->{'prices'}[0]);
+
+    // $timestamp = $price_data->{'prices'}[0][0];
+    // $timestamp = intval($timestamp / 1000);
+    // var_dump($price_data->{'prices'}[0]);
+
+    if ($_GET['crypto'] == "") {
+        $errors[] = "You must select a cryptocurrency";
+    }
+
+    if ($_GET['fiat'] == "") {
+        $errors[] = "You must select a value for fiat";
+    }
+
+    if (empty($errors)) {
+        $coingecko_api_url = "https://api.coingecko.com/api/v3/coins/" . $_GET['crypto'] . "/market_chart/range?vs_currency=" . $_GET['fiat'] . "&from=" . $_GET['start_date'] . "&to=" . $_GET['end_date'];
+    } else {
+        header('HTTP/1.1 422 Unprocessable Content');
+    }
 
     //echo date("Y-m-d", $timestamp);
 }
@@ -27,80 +42,62 @@ if (isset($_GET['crypto']) && isset($_GET['fiat']) && isset($_GET['start_date'])
 
 <body class="container">
 
-    <nav style="justify-content: flex-end; gap: 1rem;">
-        <a href="/">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-            </svg>
-            Home
-        </a>
-        <a href="search.php">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-            </svg>
-            Search API
-        </a>
-
-        <a href="price_change.php">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M4 19l16 0" />
-                <path d="M4 15l4 -6l4 2l4 -5l4 4" />
-            </svg>
-            Price Change
-        </a>
-    </nav>
+    <?php require __DIR__ . "/views/_nav.php" ?>
 
     <form action="price_change.php" method="GET">
+        <?php if (!empty($errors)): ?>
+            <div>
+                <p style="color: red">Please fix the following errors before submitting:</p>
+                <ul>
+                    <?php foreach ($errors as $e): ?>
+                        <li style="color: red"><?= $e ?></li>
+                    <?php endforeach ?>
+                </ul>
+            </div>
+        <?php endif ?>
         <label for="crypto">Select Crypto</label>
-        <select name="crypto" id="cyrpto">
-            <option value="">--Please choose an option--</option>
-            <option value="bitcoin">Bitcoin</option>
-            <option value="ethereum">Ethereum</option>
-            <option value="litecoin">Litecoin</option>
-            <option value="bitcoin-cash">Bitcoin Cash</option>
-        </select>
 
-        <label for="fiat">Select FIAT</label>
-        <select name="fiat" id="fiat">
-            <option value="usd" selected>US Dollar</option>
-            <option value="aud">Australian Dollar</option>
-            <option value="gbp">British Pound</option>
-            <option value="eur">Euro</option>
-        </select>
+        <?php if (!empty($errors)): ?>
+            <select name="crypto" id="crypto" required aria-invalid="true">
+            <?php else: ?>
+                <select name="crypto" id="crypto" required>
+                <?php endif ?>
+                <option value="">--Please choose an option--</option>
+                <option value="bitcoin">Bitcoin</option>
+                <option value="ethereum">Ethereum</option>
+                <option value="litecoin">Litecoin</option>
+                <option value="bitcoin-cash">Bitcoin Cash</option>
+                </select>
+
+                <label for="fiat">Select FIAT</label>
+
+                <?php if (!empty($errors)): ?>
+                    <select name="fiat" id="fiat" required aria-invalid="true">
+                    <?php else: ?>
+                        <select name="fiat" id="fiat" required>
+                        <?php endif ?>
+                        <option value="usd" selected>US Dollar</option>
+                        <option value="aud">Australian Dollar</option>
+                        <option value="gbp">British Pound</option>
+                        <option value="eur">Euro</option>
+                        </select>
 
 
-        <label for="start">Start Time</label>
-        <input type="date" name="start_date" value="">
+                        <label for="start">Start Time</label>
+                        <input type="date" name="start_date" value="" required>
 
-        <label for="end">End Time</label>
-        <input type="date" name="end_date" value="<?= date("Y-m-d") ?>">
+                        <label for="end">End Time</label>
+                        <input type="date" name="end_date" value="<?= date("Y-m-d") ?>" required>
 
-        <input type="submit" value="ok">
+                        <input type="submit" value="ok">
 
-    </form>\
+    </form>
 
     <?php
     if (isset($coingecko_api_url)):
+
+        $price_data = json_decode(file_get_contents($coingecko_api_url));
+
 
         foreach ($price_data->{'prices'} as $item) {
             $timestamp = intval($item[0] / 1000);
