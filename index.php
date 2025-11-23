@@ -88,6 +88,8 @@ date_default_timezone_set('America/Los_Angeles');
         }
         ?>
     </p>
+
+    <?php require "views/_footer.php" ?>
 </body>
 
 </html>

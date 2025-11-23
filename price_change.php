@@ -142,6 +142,8 @@ if (isset($_GET['crypto']) && isset($_GET['fiat']) && isset($_GET['start_date'])
 
     <?php endif; ?>
 
+    <?php require "views/_footer.php" ?>
+
 </body>
 
 </html>
